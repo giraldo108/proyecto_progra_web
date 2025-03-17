@@ -1,7 +1,11 @@
+// sequelize manejo de bd
 const sequelize = require('sequelize');
+// instancia conexion de datos
 const sequelize = require('../config/database');
 
+// la relacion entre rolesy permisos
 const RolePermission = sequelize.define('roles_permisos', {
+   // clave foranea roles
     rol_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -10,6 +14,7 @@ const RolePermission = sequelize.define('roles_permisos', {
             key: 'id'
         }
     },
+    // clave foranea permisos
     permiso_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
