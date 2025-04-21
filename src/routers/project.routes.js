@@ -1,12 +1,18 @@
-// rutas en la app
 const express = require('express');
-// crear una instancia
 const router = express.Router();
-// importar el controlador 
 const projectController = require('../controllers/project.controller');
-// def ruta para crear un proyecto
-router.post('/projects', projectController.createProject);
-// def ruta para ob proyectos
-router.get('/projects', projectController.getProjects);
+const { authenticateToken, checkRole } = require('../middlewares/auth.middlewares');
+const ROLES = require('../utils/constans');
+
+// Rutas de proyectos
+router.post('/projects', authenticateToken, checkRole([ROLES.ADMIN]), projectController.createProject);
+router.get('/projects', authenticateToken, checkRole([ROLES.ADMIN, ROLES.USER]), projectController.getAllProjects);
+router.get('/projects/:id', authenticateToken, checkRole([ROLES.ADMIN, ROLES.USER]), projectController.getProjectById);
+router.put('/projects/:id', authenticateToken, checkRole([ROLES.ADMIN]), projectController.updateProject);
+router.delete('/projects/:id', authenticateToken, checkRole([ROLES.ADMIN]), projectController.deleteProject);
+
+// Rutas de asignación de usuarios
+router.post('/projects/:id/users', authenticateToken, checkRole([ROLES.ADMIN]), projectController.assignUsersToProject);
+router.delete('/projects/:id/users/:userId', authenticateToken, checkRole([ROLES.ADMIN]), projectController.removeUserFromProject);
 
 module.exports = router;

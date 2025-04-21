@@ -5,7 +5,7 @@ require('./models/associations');
 
 dotenv.config();
 
-const PORT = process.env.PORT || 5433;
+const PORT = process.env.PORT || 5432;
 
 sequelize.authenticate()
     .then(() => {

@@ -1,9 +1,8 @@
-const jwt = require('jsonwentoken');
-const bcrypt = require('bryptjs'); //como se intala la biblioteca
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs'); //como se intala la biblioteca
 const dotenv = require('dotenv');
 const user = require('../models/user.model');
 const RolePermission = require('../models/rolePermission.model');
-const { where } = require('../config/database');
 
 dotenv.config();
 

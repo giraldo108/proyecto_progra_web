@@ -1,31 +1,14 @@
-// sequelize manejo de bd
-const sequelize = require('sequelize');
-// instancia conexion de datos
+// Importar funciones de datos de Sequelize y tambien la instancia que se hizo en el database.js
+const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-// la relacion entre rolesy permisos
+// Se define el modelo de relación entre roles y permisos
 const RolePermission = sequelize.define('roles_permisos', {
-   // clave foranea roles
-    rol_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: 'roles', // Nombre de la tabla de roles en la base de datos
-            key: 'id'
-        }
-    },
-    // clave foranea permisos
-    permiso_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: 'permisos', // Nombre de la tabla de permisos en la base de datos
-            key: 'id'
-        }
-    }
+    rol_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'roles', key: 'id' }},
+    permiso_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'permisos', key: 'id' }}
 }, {
     timestamps: false,
     tableName: 'roles_permisos',
 });
-
+// Exportamos el modelo de relación entre roles y permisos
 module.exports = RolePermission;
