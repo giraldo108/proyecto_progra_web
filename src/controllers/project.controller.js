@@ -1,22 +1,90 @@
 const projectService = require('../services/project.service');
+const Project = require('../models/project.model');
+const User = require('../models/user.model'); 
+
 
 // Crear nuevo proyecto
 exports.createProject = async (req, res) => {
     try {
-        //extraer datos del cuerpo de la peticion
+        // Verificar que el body existe
+        if (!req.body) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'El cuerpo de la solicitud no puede estar vacío' 
+            });
+        }
+
+        // Extraer y limpiar datos
         const { nombre, descripcion, administrador_id } = req.body;
-        //obtener ID del administrador desde el token de autenticacion
-        const admin_from_token = req.user.administrador_id;
-        //llamar al servicio para crear el proyeecto
-        const newProject = await projectService.createProject(nombre, descripcion, administrador_id, admin_from_token);
-        //respuesta exitosa
-        res.status(201),json({ message: 'proyecto creado con exito', newProject}); 
-    } catch (err) {
-        //manejar errores
-        res.status(500).json({ message: err.message });
+        
+        // Validación básica en el controlador (adicional a las validaciones del modelo)
+        if (!nombre?.trim()) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'El nombre del proyecto es requerido' 
+            });
+        }
+        
+        if (!descripcion?.trim()) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'La descripción del proyecto es requerida' 
+            });
+        }
+        
+        if (!administrador_id) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'El ID del administrador es requerido' 
+            });
+        }
+
+        // Verificar que el usuario autenticado es el administrador
+        if (parseInt(administrador_id) !== req.user.id) {
+            return res.status(403).json({ 
+                success: false,
+                message: 'No tienes permiso para crear proyectos para otro usuario' 
+            });
+        }
+
+        // Crear el proyecto
+        const newProject = await Project.create({
+            nombre: nombre.trim(),
+            descripcion: descripcion.trim(),
+            administrador_id
+        });
+
+        // Respuesta exitosa
+        return res.status(201).json({
+            success: true,
+            message: 'Proyecto creado exitosamente',
+            data: newProject
+        });
+
+    } catch (error) {
+        console.error('Error al crear proyecto:', error);
+        
+        // Manejo específico para errores de validación de Sequelize
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.map(err => ({
+                field: err.path,
+                message: err.message
+            }));
+            return res.status(400).json({
+                success: false,
+                message: 'Error de validación',
+                errors
+            });
+        }
+
+        // Error general del servidor
+        return res.status(500).json({
+            success: false,
+            message: 'Error interno del servidor al crear el proyecto',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
-
 // Obtener todos los proyectos (general o para administradores si luego se filtra)
 exports.getAllProjects = async (req, res) => {
     try {

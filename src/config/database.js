@@ -1,17 +1,25 @@
-const {Sequelize} = require('sequelize');
-const dotenv = require('dotenv'); // El dotenv es para poder cargar variables de entorno
+const { Sequelize } = require('sequelize');
+const dotenv = require('dotenv');
 
-dotenv.config();// Se cargan las variables de entorno
+dotenv.config();
 
-// Se crea la nueva instancia de Sequelize pasando parametros necesarios para la conección a la db
-const sequelize = new Sequelize (process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+// 1. Primero crea la configuración
+const sequelizeConfig = {
+  development: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     host: process.env.DB_HOST,
-    dialect: 'postgres',
     port: process.env.DB_PORT,
+    dialect: 'postgres',
     logging: false,
     timezone: '-05:00'
+  }
+};
 
-});
+// 2. Luego crea la instancia de Sequelize
+const sequelizeInstance = new Sequelize(sequelizeConfig.development);
 
-// por ultimo se exporta la instacia de sequelize para que pueda ser utilizada en otros archivos del proyecto
-module.exports = sequelize;
+// 3. Exporta ambas cosas PERO mantén sequelize como exportación principal
+module.exports = sequelizeInstance; // Exportación principal para tus modelos
+module.exports.config = sequelizeConfig; // Para Sequelize CLI
